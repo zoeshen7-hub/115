@@ -40,8 +40,7 @@
 
     <script>
         const liffId = "2011580579-G79pexTV";
-        // 綁定您最新的萬能 GAS 網址
-        const gasUrl = "https://script.google.com/macros/s/AKfycbw1DXSFYs4kL8vV1E4r6T8DtX8EmwoZHyhNZVUcyK8A1amY_kj1-rZSnW1NIN487awd/exec";
+        const gasUrl = "https://script.google.com/macros/s/AKfycbyMbKodkH133fvHd3Hmp13NMU73XmFk8Ws66b4qVpeXb4A4Coo-c2RMNHBm1sS-8Hcv/exec";
         const groupLink = "https://line.me/R/ti/g/uKsMQAt2uH";
 
         let userProfile = null;
@@ -77,10 +76,7 @@
             };
 
             try {
-                await fetch(gasUrl, { 
-                    method: 'POST', 
-                    body: JSON.stringify(data) 
-                });
+                await fetch(gasUrl, { method: 'POST', body: JSON.stringify(data) });
                 alert('報到成功！即將為您跳轉。');
                 window.location.href = groupLink; 
             } catch (error) {

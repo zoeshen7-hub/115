@@ -39,20 +39,15 @@
             </div>
             <div class="form-group hidden" id="detailsGroup">
                 <label>請說明短缺項目與數量</label>
-                <textarea id="details" placeholder="例如：印泥少 2 個、封條少 1 張..."></textarea>
+                <textarea id="details" placeholder="例如：印泥少 2 個 / 封條少 1 張..."></textarea>
             </div>
             <button type="submit" id="submitBtn" disabled>讀取 LINE 資料中...</button>
         </form>
     </div>
 
     <script>
-        // ==========================================
-        // ★ 共用同一個 LIFF ID
         const liffId = "2011580579-G79pexTV"; 
-        
-        // 萬能 GAS 網址 (與報到頁相同)
-        const gasUrl = "https://script.google.com/macros/s/AKfycbwUoTD9j7GtztnmnCoCLmeTpXMbAlT4RW1uNdzyhjaGPjM9iqFawN6ENCkqaqw6ceF4zg/exec";
-        // ==========================================
+        const gasUrl = "https://script.google.com/macros/s/AKfycbyMbKodkH133fvHd3Hmp13NMU73XmFk8Ws66b4qVpeXb4A4Coo-c2RMNHBm1sS-8Hcv/exec";
 
         let userProfile = null;
         const btn = document.getElementById('submitBtn');
@@ -87,7 +82,7 @@
                             stationInput.readOnly = true; 
                             stationInput.classList.add('readonly-input');
                         } else {
-                            stationInput.placeholder = "查無資料，請手動輸入";
+                            stationInput.placeholder = "查無報到資料，請手動輸入";
                         }
                     } catch(err) {
                         document.getElementById('stationNumber').placeholder = "查詢失敗，請手動輸入";

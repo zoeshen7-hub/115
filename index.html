@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>選務人員群組報到</title>
-    <!-- 引入 LINE LIFF SDK -->
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f5f7; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
@@ -21,11 +20,7 @@
 <body>
     <div class="card">
         <h2>選務人員群組報到</h2>
-
-        <!-- 錯誤訊息 -->
         <div id="error-box"></div>
-        
-        <!-- 表單一開始就直接顯示 -->
         <form id="regForm">
             <div class="form-group">
                 <label>投開票所編號</label>
@@ -39,45 +34,35 @@
                     <option value="主任監察員">主任監察員</option>
                 </select>
             </div>
-            <!-- 按鈕一開始鎖定，等 LINE 讀好才開放 -->
             <button type="submit" id="submitBtn" disabled>讀取 LINE 資料中...</button>
         </form>
     </div>
 
     <script>
         // ==========================================
-        const liffId = "2011580579-G79pexTV";
-        const gasUrl = "https://script.google.com/macros/s/AKfycbxvcltwOgsA2OFl0Seuf9AXbP6lyFXX_nocIlB0VoaDIiovz6cPOdRDlJHl8iRT1pHYVw/exec";
+        const liffId = "2011580579-G79pexTV"; // 第一個 LIFF (報到用)
+        const gasUrl = "https://script.google.com/macros/s/AKfycbwUoTD9j7GtztnmnCoCLmeTpXMbAlT4RW1uNdzyhjaGPjM9iqFawN6ENCkqaqw6ceF4zg/exec";
         const groupLink = "https://line.me/R/ti/g/uKsMQAt2uH";
         // ==========================================
 
         let userProfile = null;
         const btn = document.getElementById('submitBtn');
 
-        function showError(message) {
-            const errorBox = document.getElementById('error-box');
-            errorBox.style.display = 'block';
-            errorBox.innerText = "發生錯誤：" + message;
-            btn.innerText = "無法載入 LINE 授權";
-        }
-
         async function initializeLiff() {
             try {
                 await liff.init({ liffId: liffId });
                 if (liff.isLoggedIn()) {
                     userProfile = await liff.getProfile();
-                    // LINE 載入完成，解鎖按鈕
                     btn.disabled = false;
                     btn.innerText = "送出資料並加入群組";
                 } else {
                     liff.login();
                 }
             } catch (err) {
-                showError("LIFF 初始化失敗 (" + err.message + ")。");
+                document.getElementById('error-box').style.display = 'block';
+                document.getElementById('error-box').innerText = "載入失敗：" + err.message;
             }
         }
-
-        // 網頁一打開就開始在背景載入 LINE
         initializeLiff();
 
         document.getElementById('regForm').addEventListener('submit', async (e) => {
@@ -86,22 +71,19 @@
             btn.innerText = "資料傳送中...";
 
             const data = {
+                userId: userProfile ? userProfile.userId : "", // 傳送 ID 供未來查詢
                 displayName: userProfile ? userProfile.displayName : "未授權",
                 stationNumber: document.getElementById('stationNumber').value,
                 role: document.getElementById('role').value
             };
 
             try {
-                const response = await fetch(gasUrl, {
-                    method: 'POST',
-                    body: JSON.stringify(data)
-                });
-                
+                await fetch(gasUrl, { method: 'POST', body: JSON.stringify(data) });
                 alert('報到成功！即將為您跳轉。');
                 window.location.href = groupLink; 
-                
             } catch (error) {
-                showError("表單送出失敗 (" + error.message + ")。請確認 GAS 已重新部署且權限為「所有人」。");
+                document.getElementById('error-box').style.display = 'block';
+                document.getElementById('error-box').innerText = "傳送失敗：" + error.message;
                 btn.disabled = false;
                 btn.innerText = "送出資料並加入群組";
             }

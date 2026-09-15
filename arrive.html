@@ -31,8 +31,8 @@
     </div>
 
     <script>
-        const liffId = "2011580579-G79pexTV"; // 請確認是否需要獨立開一個 LIFF ID，若共用則保留
-        const gasUrl = "https://script.google.com/macros/s/AKfycbyMbKodkH133fvHd3Hmp13NMU73XmFk8Ws66b4qVpeXb4A4Coo-c2RMNHBm1sS-8Hcv/exec"; // 換成您的GAS網址
+        const liffId = "2011580579-G79pexTV"; 
+        const gasUrl = "https://script.google.com/macros/s/AKfycbyMbKodkH133fvHd3Hmp13NMU73XmFk8Ws66b4qVpeXb4A4Coo-c2RMNHBm1sS-8Hcv/exec";
 
         let userProfile = null;
         const btn = document.getElementById('submitBtn');
@@ -70,7 +70,13 @@
             try {
                 await fetch(gasUrl, { method: 'POST', body: JSON.stringify(data) });
                 alert('已成功回報抵達！辛苦了！');
-                liff.closeWindow();
+                
+                // 送出成功後自動關閉視窗
+                if (liff.isInClient()) {
+                    liff.closeWindow();
+                } else {
+                    window.location.href = "about:blank"; // 若在一般瀏覽器開啟時的備用處理
+                }
             } catch (error) {
                 document.getElementById('error-box').style.display = 'block';
                 document.getElementById('error-box').innerText = "傳送失敗：" + error.message;

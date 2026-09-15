@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>選務工具短缺回報</title>
+    <title>抵達票所回報</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f5f7; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
@@ -11,25 +11,20 @@
         h2 { text-align: center; color: #333; margin-top: 0; margin-bottom: 20px; }
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
-        input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; font-family: inherit; }
-        textarea { resize: vertical; min-height: 100px; }
-        button { width: 100%; padding: 14px; background-color: #e67e22; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 14px; background-color: #06C755; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         button:disabled { background-color: #ccc; cursor: not-allowed; }
         #error-box { display: none; background: #fee; color: #c00; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: bold; word-break: break-all; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>⚠️ 工具短缺回報</h2>
+        <h2>✅ 抵達票所回報</h2>
         <div id="error-box"></div>
-        <form id="shortageForm">
+        <form id="arriveForm">
             <div class="form-group">
-                <label>投開票所編號</label>
+                <label>請輸入您的投開票所編號</label>
                 <input type="text" id="stationNumber" placeholder="例如：0123" required>
-            </div>
-            <div class="form-group">
-                <label>短缺項目與數量說明</label>
-                <textarea id="details" placeholder="例如：印泥少 2 個、封條少 1 張..." required></textarea>
             </div>
             <button type="submit" id="submitBtn" disabled>讀取 LINE 資料中...</button>
         </form>
@@ -48,7 +43,7 @@
                 if (liff.isLoggedIn()) {
                     userProfile = await liff.getProfile();
                     btn.disabled = false;
-                    btn.innerText = "送出短缺回報";
+                    btn.innerText = "確認送出抵達回報";
                 } else {
                     liff.login();
                 }
@@ -59,7 +54,7 @@
         }
         initializeLiff();
 
-        document.getElementById('shortageForm').addEventListener('submit', async (e) => {
+        document.getElementById('arriveForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             btn.disabled = true;
             btn.innerText = "傳送中...";
@@ -68,19 +63,19 @@
                 action: "report",
                 displayName: userProfile ? userProfile.displayName : "未授權",
                 stationNumber: document.getElementById('stationNumber').value,
-                reportType: "選務工具短缺",
-                details: document.getElementById('details').value
+                reportType: "抵達票所",
+                details: "已安全抵達"
             };
 
             try {
                 await fetch(gasUrl, { method: 'POST', body: JSON.stringify(data) });
-                alert('已送出短缺回報！');
+                alert('已成功回報抵達！辛苦了！');
                 liff.closeWindow();
             } catch (error) {
                 document.getElementById('error-box').style.display = 'block';
                 document.getElementById('error-box').innerText = "傳送失敗：" + error.message;
                 btn.disabled = false;
-                btn.innerText = "送出短缺回報";
+                btn.innerText = "確認送出抵達回報";
             }
         });
     </script>

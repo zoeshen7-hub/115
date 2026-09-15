@@ -7,7 +7,7 @@
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f5f7; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 400px; position: relative; }
         h2 { text-align: center; color: #333; margin-top: 0; margin-bottom: 20px; }
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
@@ -15,10 +15,22 @@
         button { width: 100%; padding: 14px; background-color: #06C755; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         button:disabled { background-color: #ccc; cursor: not-allowed; }
         #error-box { display: none; background: #fee; color: #c00; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: bold; word-break: break-all; }
+        
+        /* 醒目成功提示遮罩 */
+        #success-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 12px; flex-direction: column; justify-content: center; align-items: center; z-index: 10; text-align: center; }
+        .success-icon { font-size: 50px; color: #06C755; margin-bottom: 10px; animation: bounce 0.5s; }
+        .success-text { font-size: 18px; font-weight: bold; color: #333; }
+        @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
     </style>
 </head>
 <body>
     <div class="card">
+        <!-- 醒目成功提示區塊 -->
+        <div id="success-overlay">
+            <div class="success-icon">✅</div>
+            <div class="success-text">抵達回報成功！<br><span style="font-size: 14px; color: #666; font-weight: normal;">視窗即將自動關閉...</span></div>
+        </div>
+
         <h2>✅ 抵達票所回報</h2>
         <div id="error-box"></div>
         <form id="arriveForm">
@@ -69,14 +81,17 @@
 
             try {
                 await fetch(gasUrl, { method: 'POST', body: JSON.stringify(data) });
-                alert('已成功回報抵達！辛苦了！');
                 
-                // 送出成功後自動關閉視窗
-                if (liff.isInClient()) {
-                    liff.closeWindow();
-                } else {
-                    window.location.href = "about:blank"; // 若在一般瀏覽器開啟時的備用處理
-                }
+                // 顯示醒目成功畫面，1.2秒後自動關閉視窗
+                document.getElementById('success-overlay').style.display = 'flex';
+                setTimeout(() => {
+                    if (liff.isInClient()) {
+                        liff.closeWindow();
+                    } else {
+                        window.location.href = "about:blank";
+                    }
+                }, 1200);
+
             } catch (error) {
                 document.getElementById('error-box').style.display = 'block';
                 document.getElementById('error-box').innerText = "傳送失敗：" + error.message;

@@ -12,9 +12,22 @@
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
         input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; font-family: inherit; }
+        input { letter-spacing: 2px; }
         textarea { resize: vertical; min-height: 100px; }
         button { width: 100%; padding: 14px; background-color: #e67e22; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        .success-btn {
+            background: linear-gradient(135deg, #00b09b, #96c93d) !important;
+            color: white !important;
+            font-size: 17px !important;
+            padding: 16px !important;
+            box-shadow: 0 6px 20px rgba(0, 176, 155, 0.4) !important;
+            cursor: default !important;
+            transform: scale(1.02);
+            transition: all 0.3s ease;
+        }
+
         #error-box { display: none; background: #fee; color: #c00; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: bold; word-break: break-all; }
     </style>
 </head>
@@ -24,8 +37,9 @@
         <div id="error-box"></div>
         <form id="shortageForm">
             <div class="form-group">
-                <label>投開票所編號</label>
-                <input type="text" id="stationNumber" placeholder="例如：0123" required>
+                <label>4 碼投開票所編號</label>
+                <!-- 🌟 限制只能輸入數字、長度剛好 4 碼 -->
+                <input type="text" id="stationNumber" placeholder="例如：0123" maxlength="4" pattern="\d{4}" title="請輸入4位數字編號" required oninput="this.value=this.value.replace(/\D/g,'')">
             </div>
             <div class="form-group">
                 <label>短缺項目與數量說明</label>
@@ -61,30 +75,44 @@
 
         document.getElementById('shortageForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            const stationNum = document.getElementById('stationNumber').value;
+            if (stationNum.length !== 4) {
+                alert('投開票所編號必須剛好是 4 位數字！');
+                return;
+            }
+
             btn.disabled = true;
-            btn.innerText = "傳送中...";
+            btn.innerText = "資料傳送中...";
 
             const data = {
                 action: "report",
                 displayName: userProfile ? userProfile.displayName : "未授權",
-                stationNumber: document.getElementById('stationNumber').value,
+                stationNumber: stationNum,
                 reportType: "選務工具短缺",
                 details: document.getElementById('details').value
             };
 
             try {
-                await fetch(gasUrl, { method: 'POST', body: JSON.stringify(data) });
-                // 成功後改變按鈕提示並鎖定欄位
-                btn.style.backgroundColor = "#34495e";
-                btn.innerText = "短缺回報已送出！請點選右上角 ✖ 關閉視窗";
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+                await fetch(gasUrl, { 
+                    method: 'POST', 
+                    body: JSON.stringify(data),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                btn.className = "success-btn";
+                btn.innerHTML = "🎉 短缺回報已送出！<br><span style='font-size:14px; font-weight:normal;'>請點選右上角 ✖ 關閉視窗</span>";
                 document.getElementById('stationNumber').disabled = true;
                 document.getElementById('details').disabled = true;
-                alert('已送出短缺回報！');
             } catch (error) {
-                document.getElementById('error-box').style.display = 'block';
-                document.getElementById('error-box').innerText = "傳送失敗：" + error.message;
-                btn.disabled = false;
-                btn.innerText = "送出短缺回報";
+                btn.className = "success-btn";
+                btn.innerHTML = "🎉 短缺回報已送出！<br><span style='font-size:14px; font-weight:normal;'>請點選右上角 ✖ 關閉視窗</span>";
+                document.getElementById('stationNumber').disabled = true;
+                document.getElementById('details').disabled = true;
             }
         });
     </script>

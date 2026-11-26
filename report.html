@@ -38,7 +38,6 @@
         <form id="shortageForm">
             <div class="form-group">
                 <label>4 碼投開票所編號</label>
-                <!-- 🌟 限制只能輸入數字、長度剛好 4 碼 -->
                 <input type="text" id="stationNumber" placeholder="例如：0123" maxlength="4" pattern="\d{4}" title="請輸入4位數字編號" required oninput="this.value=this.value.replace(/\D/g,'')">
             </div>
             <div class="form-group">
@@ -50,7 +49,7 @@
     </div>
 
     <script>
-        const liffId = "2011580579-G79pexTV";
+        const liffId = "2011580579-uP1XSVWb";
         const gasUrl = "https://script.google.com/macros/s/AKfycbyMbKodkH133fvHd3Hmp13NMU73XmFk8Ws66b4qVpeXb4A4Coo-c2RMNHBm1sS-8Hcv/exec";
 
         let userProfile = null;
